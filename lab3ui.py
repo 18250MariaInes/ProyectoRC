@@ -3,12 +3,13 @@ import pygame.freetype
 from pygame.sprite import Sprite
 from pygame.rect import Rect
 from enum import Enum
-from math import cos, sin, pi
+from math import cos, sin, pi, atan2
 
 #colors for the game
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 BACKGROUND = (62,3,4)
+SPRITE_BACKGROUND = (152, 0, 136, 255)
 
 
 #textures for blocks
@@ -19,6 +20,19 @@ textures = {
     '4' : pygame.image.load('block4.png'),
     '5' : pygame.image.load('block3.png')
     }
+
+enemies = [{"x": 100,
+            "y": 200,
+            "texture" : pygame.image.load('sprite1.png')},
+
+           {"x": 270,
+            "y": 200,
+            "texture" : pygame.image.load('sprite2.png')},
+
+           {"x": 320,
+            "y": 420,
+            "texture" : pygame.image.load('sprite3.png')}    
+    ]
 
 #background and other images
 background=pygame.image.load('bg5.jpg')
@@ -33,6 +47,7 @@ class Raycaster(object):
         _, _, self.width, self.height = screen.get_rect()
 
         self.map = []
+        self.zbuffer = [-float('inf') for z in range(int(self.width / 2))]
         self.blocksize = 50
         self.wallHeight = 50
 
@@ -64,6 +79,38 @@ class Raycaster(object):
     def drawPlayerIcon(self,color):
         rect = (self.player['x'] - 2, self.player['y'] - 2, 5, 5)
         self.screen.fill(color, rect)
+
+    def drawSprite(self, sprite, size):
+        # Pitagoras
+        spriteDist = ((self.player['x'] - sprite['x'])**2 + (self.player['y'] - sprite['y'])**2) ** 0.5
+        
+        # Angulo entre el personaje y el sprite, arco tangente 2
+        spriteAngle = atan2(sprite['y'] - self.player['y'], sprite['x'] - self.player['x'])
+
+        aspectRatio = sprite["texture"].get_width() / sprite["texture"].get_height()
+        spriteHeight = (self.height / spriteDist) * size
+        spriteWidth = spriteHeight * aspectRatio
+
+        #Convertir a radianes
+        angleRads = self.player['angle'] * pi / 180
+        fovRads = self.player['fov'] * pi / 180
+
+        #Buscamos el punto inicial para dibujar el sprite
+        startX = (self.width * 3 / 4) + (spriteAngle - angleRads)*(self.width/2) / fovRads - (spriteWidth/2)
+        startY = (self.height / 2) - (spriteHeight / 2)
+        startX = int(startX)
+        startY = int(startY)
+
+        for x in range(startX, int(startX + spriteWidth)):
+            for y in range(startY, int(startY + spriteHeight)):
+                if (self.width / 2) < x < self.width:
+                    if self.zbuffer[ x - int(self.width/2)] >= spriteDist:
+                        tx = int( (x - startX) * sprite["texture"].get_width() / spriteWidth )
+                        ty = int( (y - startY) * sprite["texture"].get_height() / spriteHeight )
+                        texColor = sprite["texture"].get_at((tx, ty))
+                        if texColor[3] > 128 and texColor != SPRITE_BACKGROUND:
+                            self.screen.set_at((x,y), texColor)
+                            self.zbuffer[ x - int(self.width/2)] = spriteDist
 
     #Los rayos de vista del jugador son calculados
     def castRay(self, a):
@@ -113,7 +160,7 @@ class Raycaster(object):
         for i in range(halfWidth):
             angle = self.player['angle'] - self.player['fov'] / 2 + self.player['fov'] * i / halfWidth
             dist, wallType, tx = self.castRay(angle)
-
+            self.zbuffer[i] = dist
             x = halfWidth + i 
 
             # perceivedHeight = screenHeight / (distance * cos( rayAngle - viewAngle) * wallHeight ----- Formula para el alto de las paredes
@@ -130,7 +177,11 @@ class Raycaster(object):
                 ty = int(ty * img.get_height())
                 texColor = img.get_at((tx, ty))
                 self.screen.set_at((x, y), texColor)
-
+            
+            
+        for enemy in enemies:
+            self.screen.fill(pygame.Color("black"), (enemy['x'], enemy['y'], 3,3))
+            self.drawSprite(enemy, 30)
 
 
         for i in range(self.height):
@@ -297,7 +348,7 @@ def play_level(screen):
     r = Raycaster(screen)
 
     #se carga el mapa del nivel del juego en base al .txt
-    r.load_map('map.txt')
+    r.load_map('map2.txt')
 
     isRunning = True
     #return_btn.draw(screen)
