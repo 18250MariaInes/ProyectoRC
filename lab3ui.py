@@ -68,6 +68,11 @@ class Raycaster(object):
             for line in f.readlines():
                 self.map.append(list(line))
 
+    #play a step sound when moving
+    def play_step(self):
+        pygame.mixer.music.load('mariostep.mp3')
+        pygame.mixer.music.play(0)
+
     #se dibujan los muros del nivel
     def drawRect(self, x, y, tex):
         tex = pygame.transform.scale(tex, (self.blocksize, self.blocksize))
@@ -352,6 +357,7 @@ def play_level(screen):
 
     isRunning = True
     #return_btn.draw(screen)
+    
     while isRunning:
         mouse_up=False
         return_btn.draw(screen)
@@ -378,19 +384,27 @@ def play_level(screen):
                 elif ev.key == pygame.K_UP:
                     newX += cos(r.player['angle'] * pi / 180) * r.stepSize
                     newY += sin(r.player['angle'] * pi / 180) * r.stepSize
+                    #play a step sound when moving
+                    r.play_step()
                 elif ev.key == pygame.K_DOWN:
                     newX -= cos(r.player['angle'] * pi / 180) * r.stepSize
                     newY -= sin(r.player['angle'] * pi / 180) * r.stepSize
+                    #play a step sound when moving
+                    r.play_step()
                 elif ev.key == pygame.K_LEFT:
                     newX -= cos((r.player['angle'] + 90) * pi / 180) * r.stepSize
                     newY -= sin((r.player['angle'] + 90) * pi / 180) * r.stepSize
+                    #play a step sound when moving
+                    r.play_step()
                 elif ev.key == pygame.K_RIGHT:
                     newX += cos((r.player['angle'] + 90) * pi / 180) * r.stepSize
                     newY += sin((r.player['angle'] + 90) * pi / 180) * r.stepSize
-                elif ev.key == pygame.K_q:
+                    #play a step sound when moving
+                    r.play_step()
+                """elif ev.key == pygame.K_q:
                     r.player['angle'] -= 5
                 elif ev.key == pygame.K_e:
-                    r.player['angle'] += 5
+                    r.player['angle'] += 5"""
 
 
                 i = int(newX / r.blocksize)
@@ -399,6 +413,13 @@ def play_level(screen):
                 if r.map[j][i] == ' ':
                     r.player['x'] = newX
                     r.player['y'] = newY
+            if ev.type == pygame.MOUSEBUTTONDOWN or ev.type == pygame.MOUSEBUTTONUP:
+                if ev.button == 4:
+                    
+                    r.player['angle'] -= 5
+                if ev.button == 5:
+                    
+                    r.player['angle'] += 5
 
         screen.fill(pygame.Color("forestgreen")) #Background
 
