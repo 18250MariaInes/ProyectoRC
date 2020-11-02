@@ -9,7 +9,7 @@ from math import cos, sin, pi, atan2
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 BACKGROUND = (62,3,4)
-SPRITE_BACKGROUND = (152, 0, 136, 255)
+SPRITE_BACKGROUND = (206, 229, 241)
 
 
 #textures for blocks
@@ -23,15 +23,15 @@ textures = {
 
 enemies = [{"x": 100,
             "y": 200,
-            "texture" : pygame.image.load('sprite1.png')},
+            "texture" : pygame.image.load('boss2.png')},
 
            {"x": 270,
             "y": 200,
-            "texture" : pygame.image.load('sprite2.png')},
+            "texture" : pygame.image.load('boss3.png')},
 
            {"x": 320,
             "y": 420,
-            "texture" : pygame.image.load('sprite3.png')}    
+            "texture" : pygame.image.load('boss5.png')}    
     ]
 
 #background and other images
