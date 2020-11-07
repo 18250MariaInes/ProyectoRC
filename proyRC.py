@@ -23,7 +23,7 @@ textures = {
 
 enemies = [{"x": 100,
             "y": 200,
-            "texture" : pygame.image.load('boss7.png')},
+            "texture" : pygame.image.load('boss2.png')},
 
            {"x": 270,
             "y": 200,
@@ -32,15 +32,13 @@ enemies = [{"x": 100,
            {"x": 320,
             "y": 420,
             "texture" : pygame.image.load('boss5.png')},
-
-            {"x": 102,
-            "y": 200,
+            {"x": 100,
+            "y": 100,
             "texture" : pygame.image.load('boss7.png')},
 
-            {"x": 200,
-            "y": 300,
-            "texture" : pygame.image.load('boss7.png')} 
-             
+            {"x": 400,
+            "y": 100,
+            "texture" : pygame.image.load('boss6.png')}     
     ]
 
 #background and other images
